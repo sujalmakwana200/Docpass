@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DocPass — Demo Frontend</title>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --card: #ffffff;
+      --border: #e4e2dc;
+      --text: #1f1e1d;
+      --muted: #6b6a68;
+      --accent: #1f1e1d;
+      --blue: #0b57d0;
+      --pass-bg: #e6f4ea;
+      --pass-fg: #137333;
+      --fail-bg: #fce8e6;
+      --fail-fg: #c5221f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .brand { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .status-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+    }
+    .status-pill.ok { background: var(--pass-bg); color: var(--pass-fg); border-color: transparent; }
+    .status-pill.err { background: var(--fail-bg); color: var(--fail-fg); border-color: transparent; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .sub { margin: 0 0 20px; color: var(--muted); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d5d3cc;
+      border-radius: 8px;
+      background: #fff;
+      font: inherit;
+    }
+    .dropzone {
+      border: 2px dashed #cfcdc6;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      background: #fcfcfa;
+      transition: border-color .15s, background .15s;
+    }
+    .dropzone.drag { border-color: var(--blue); background: #f3f7fe; }
+    .file-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .file-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+    }
+    .quota { margin-top: 12px; font-size: 12px; color: var(--muted); }
+    button.primary {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font: 600 15px/1.2 inherit;
+      cursor: pointer;
+    }
+    button.primary:disabled { opacity: .55; cursor: wait; }
+    .results { margin-top: 22px; display: flex; flex-direction: column; gap: 12px; }
+    .res-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fcfcfa;
+    }
+    .res-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.pass { background: var(--pass-bg); color: var(--pass-fg); }
+    .badge.fail { background: var(--fail-bg); color: var(--fail-fg); }
+    .checks { margin: 10px 0 14px; padding-left: 18px; font-size: 13px; }
+    .checks li { margin: 4px 0; }
+    .dl-btn {
+      display: inline-block;
+      padding: 9px 14px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .err-box {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--fail-bg);
+      color: var(--fail-fg);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">DocPass</div>
+      <div id="healthPill" class="status-pill">Checking backend...</div>
+    </div>
+
+    <div class="card">
+      <h1>Convert &amp; Portal Preflight</h1>
+      <p class="sub">Pick up to 3 files and a portal preset. The backend converts them and runs Pass/Fail checks.</p>
+
+      <div>
+        <label for="apiBase">Backend URL</label>
+        <input id="apiBase" type="text" value="http://localhost:8000" />
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label>Files (max 3, 50 MB each)</label>
+        <div id="dropzone" class="dropzone">
+          <div>Drop files here or <strong>click to choose</strong></div>
+          <div style="font-size:12px;color:#6b6a68;margin-top:4px;">Supports .docx, .xlsx, .pptx, .png, .jpg, .webp, .md, .txt, .pdf</div>
+          <input id="fileInput" type="file" multiple hidden />
+        </div>
+        <div id="fileList" class="file-list"></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="targetFormat">Target Format</label>
+          <select id="targetFormat">
+            <option value="pdf">PDF (.pdf)</option>
+            <option value="png">PNG (.png)</option>
+            <option value="jpg">JPG (.jpg)</option>
+            <option value="webp">WEBP (.webp)</option>
+          </select>
+        </div>
+        <div>
+          <label for="presetSelect">Portal Preset</label>
+          <select id="presetSelect">
+            <option value="govt_portal_200kb">Govt Portal Upload (Under 200 KB)</option>
+            <option value="visa_500kb">Visa / Immigration (Under 500 KB)</option>
+            <option value="tender_2mb">e-Tender / Procurement (Under 2 MB)</option>
+            <option value="none">None (Plain conversion)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="quotaLine" class="quota">Free plan: up to 3 files per run, 10 conversions/day (resets midnight IST).</div>
+
+      <button id="convertBtn" class="primary">Convert Files</button>
+      <div id="results" class="results"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiBaseEl = document.getElementById("apiBase");
+    const healthPill = document.getElementById("healthPill");
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const fileListEl = document.getElementById("fileList");
+    const targetFormatEl = document.getElementById("targetFormat");
+    const presetSelectEl = document.getElementById("presetSelect");
+    const quotaLineEl = document.getElementById("quotaLine");
+    const convertBtn = document.getElementById("convertBtn");
+    const resultsEl = document.getElementById("results");
+
+    let selectedFiles = [];
+
+    function apiUrl(path) {
+      return apiBaseEl.value.replace(/\/+$/, "") + path;
+    }
+
+    async function checkBackend() {
+      try {
+        const [hRes, lRes] = await Promise.all([
+          fetch(apiUrl("/health")),
+          fetch(apiUrl("/api/limits")),
+        ]);
+        if (!hRes.ok) throw new Error("Health check failed");
+        const h = await hRes.json();
+        healthPill.textContent = `Backend Online (LibreOffice: ${h.libreoffice_found ? "Yes" : "Fallback"})`;
+        healthPill.className = "status-pill ok";
+        if (lRes.ok) {
+          const lim = await lRes.json();
+          quotaLineEl.textContent = `Free plan: ${lim.remaining_today} of ${lim.daily_limit} conversions left today (max ${lim.max_files_per_run} files/run).`;
+        }
+      } catch (err) {
+        healthPill.textContent = "Backend Offline — start uvicorn on port 8000";
+        healthPill.className = "status-pill err";
+      }
+    }
+
+    function renderSelectedFiles() {
+      fileListEl.innerHTML = selectedFiles
+        .map((f, i) => `
+          <div class="file-chip">
+            <span>${f.name} (${(f.size / 1024).toFixed(1)} KB)</span>
+            <button type="button" onclick="removeFile(${i})" style="border:0;background:none;color:#c5221f;cursor:pointer;font-weight:600;">Remove</button>
+          </div>
+        `)
+        .join("");
+    }
+
+    window.removeFile = (idx) => {
+      selectedFiles.splice(idx, 1);
+      renderSelectedFiles();
+    };
+
+    function setFiles(fileList) {
+      const incoming = Array.from(fileList);
+      selectedFiles = selectedFiles.concat(incoming).slice(0, 3);
+      renderSelectedFiles();
+    }
+
+    dropzone.onclick = () => fileInput.click();
+    fileInput.onchange = () => { setFiles(fileInput.files); fileInput.value = ""; };
+    dropzone.ondragover = (e) => { e.preventDefault(); dropzone.classList.add("drag"); };
+    dropzone.ondragleave = () => dropzone.classList.remove("drag");
+    dropzone.ondrop = (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("drag");
+      setFiles(e.dataTransfer.files);
+    };
+
+    convertBtn.onclick = async () => {
+      if (!selectedFiles.length) {
+        resultsEl.innerHTML = `<div class="err-box">Please select at least 1 file first.</div>`;
+        return;
+      }
+      convertBtn.disabled = true;
+      convertBtn.textContent = "Converting...";
+      resultsEl.innerHTML = "";
+
+      const fd = new FormData();
+      selectedFiles.forEach((f) => fd.append("files", f));
+      fd.append("target_format", targetFormatEl.value);
+      fd.append("preset", presetSelectEl.value);
+
+      try {
+        const res = await fetch(apiUrl("/api/convert"), { method: "POST", body: fd });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail || data));
+        }
+        resultsEl.innerHTML = data.files.map((f) => {
+          const ok = f.portal_report.ready_for_portal;
+          const checks = f.portal_report.checks.map((c) => `
+            <li>
+              <strong>${c.label}:</strong> ${c.detail}
+              <span class="badge ${c.passed ? "pass" : "fail"}">${c.status}</span>
+            </li>
+          `).join("");
+          return `
+            <div class="res-card">
+              <div class="res-head">
+                <strong>${f.output_filename} (${f.size_kb} KB)</strong>
+                <span class="badge ${ok ? "pass" : "fail"}">${ok ? "Ready for Portal" : "Needs Review"}</span>
+              </div>
+              <ul class="checks">${checks}</ul>
+              <a class="dl-btn" href="${apiUrl(f.download_url)}" download="${f.output_filename}">
+                Download ${f.output_filename}
+              </a>
+            </div>
+          `;
+        }).join("");
+        checkBackend();
+      } catch (err) {
+        resultsEl.innerHTML = `<div class="err-box">Conversion failed: ${err.message}</div>`;
+      } finally {
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convert Files";
+      }
+    };
+
+    apiBaseEl.onchange = checkBackend;
+    checkBackend();
+  </script>
+</body>
+</html>

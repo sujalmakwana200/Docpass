@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DocPass – PDFs that portals accept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="nav"><div class="w"><a class="logo" href="#top">Doc<i>Pass</i></a><a class="hide" href="#tools">Tools</a><a class="hide" href="#pricing">Pricing</a><a class="hide" href="#privacy">Privacy</a><a class="btn" href="#work">Open workbench</a></div></header>
+
+<main id="top">
+<div class="hero"><div class="w">
+<div><h1>Convert once. Upload once. Accepted.</h1>
+<p class="lead">22 everyday PDF tools, free. Pick your portal and DocPass checks size, page size, searchable text and file name before you download.</p>
+<a class="btn alt" href="#tools">Pick a tool</a></div>
+<div class="sheet" aria-label="Example portal check"><h4>GST_Reply_Notice_Final.pdf</h4><span class="stamp s-ok">ACCEPTED</span>
+<ul class="ck"><li><span>Size</span><b>412 KB of 1 MB allowed</b><i class="p1">Pass</i></li><li><span>Page size</span><b>A4</b><i class="p1">Pass</i></li><li><span>Searchable text</span><b>Yes</b><i class="p1">Pass</i></li><li><span>File name</span><b>Format OK</b><i class="p1">Pass</i></li></ul></div>
+</div></div>
+
+<section id="tools"><div class="w"><h2>Pick a tool</h2>
+<p class="sub">No account needed. Files over 50 MB, more than 3 files per run, or more than 10 runs a day need Pro. Tools marked “works now” run inside your browser, so the file never leaves this tab.</p>
+<div class="tg" id="tg"></div></div></section>
+
+<section id="work"><div class="w"><h2>Workbench</h2>
+<p class="sub">Choose a portal preset and the result is checked against its rules before you save it.</p>
+<div class="wbg"><div class="pn" id="wb"></div><div class="pn" id="res" aria-live="polite"><p class="empty">Your result and portal check will show up here.</p></div></div></div></section>
+
+<section id="pricing"><div class="w"><h2>Free for the basics, Pro for the portal work</h2>
+<p class="sub">Prices are placeholders until interviews confirm what offices will pay.</p>
+<div class="pg"><div class="pl"><h3>Free</h3><div class="pr">₹0</div><ul><li>All 22 core tools, no account</li><li>50 MB per file, 3 files per run</li><li>10 runs per day</li><li>Files deleted after 1 hour</li></ul></div>
+<div class="pl pro"><h3>Pro</h3><div class="pr">₹299 <small>per user, per month</small></div><ul><li>Portal presets: GST, tender, admission</li><li>Target-size compression: get under 200 KB</li><li>OCR to searchable PDF</li><li>50+ file batches with rename and merge rules</li><li>Letterhead, history, no daily cap</li></ul>
+<div class="wl"><input id="em" type="email" placeholder="you@office.in" aria-label="Email for the Pro waitlist"><button class="btn alt" id="wj">Join the waitlist</button></div><p class="mut" id="wm">Pro is not live yet. Payments (Razorpay or Stripe) come in Phase 1.</p></div></div></div></section>
+
+<section id="privacy"><div class="w priv"><div><h2>Your files stay yours</h2><p class="sub" style="margin-bottom:0">Office documents are sensitive, so the rules are short and plain.</p></div>
+<ul><li><b>HTTPS only</b>Files travel over an encrypted connection.</li><li><b>Used for one thing</b>Your file is used only to make your PDF.</li><li><b>Deleted automatically</b>One hour after upload on Free, longer on Pro.</li></ul></div></section>
+</main>
+<footer><div class="w">DocPass · Draft v1 front end. Merge, split, extract or delete pages, rotate, watermark, page numbers and image to PDF work in your browser today. The other tools need the FastAPI backend (LibreOffice, Ghostscript, OCR) to process real files.</div></footer>
+
+<script src="script.js"></script>
+</body></html>

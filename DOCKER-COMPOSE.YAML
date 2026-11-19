@@ -1,0 +1,10 @@
+services:
+  docpass:
+    build: .
+    container_name: docpass-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DOCPASS_TTL_MINUTES=60
+      - DOCPASS_DAILY_LIMIT=10
+    restart: unless-stopped
