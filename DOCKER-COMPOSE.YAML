@@ -8,3 +8,4 @@ services:
       - DOCPASS_TTL_MINUTES=60
       - DOCPASS_DAILY_LIMIT=10
     restart: unless-stopped
+    CMD sh -c "uvicorn docpass_backend:app --host 0.0.0.0 --port ${PORT:-8000}"
